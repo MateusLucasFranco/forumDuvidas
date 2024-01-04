@@ -10,9 +10,11 @@ class SupportController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Support $support)
     {
-        return view('admin.supports.index');
+        $supports = $support->all();
+        
+        return view('admin.supports.index', compact('supports'));
     }
 
     /**
@@ -20,7 +22,7 @@ class SupportController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.supports.create');
     }
 
     /**
@@ -28,7 +30,7 @@ class SupportController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
