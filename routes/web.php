@@ -40,5 +40,3 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/supports', [SupportController::class, 'store'])->name('supports.store');
     Route::get('/supports', [SupportController::class, 'index'])->name('supports.index');
 });
-
-require __DIR__ . '/auth/php';
