@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class SupportController extends Controller
 {
+    public function __construct(
+        protected SupportService $service
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -28,17 +32,26 @@ class SupportController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Support $support)
     {
-        
+        $data = $request->all();
+        $data['status'] = 'a';
+
+        $support->create($data);
+
+        return redirect()->route('supports.index');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Support $support)
+    public function show(Support $support, $id)
     {
-        //
+        if(!$support = Support::find($id)) {
+            return back();
+        }
+        
+        return view('admin.supports.show', compact('support'));
     }
 
     /**
