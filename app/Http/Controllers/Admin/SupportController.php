@@ -1,8 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\DTO\Supports\CreateSupportDTO;
+use App\DTO\Supports\UpdateSupportDTO;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUpdateSupport;
 use App\Models\Support;
+use App\Services\SupportService;
 use Illuminate\Http\Request;
 
 class SupportController extends Controller
@@ -14,11 +19,17 @@ class SupportController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Support $support)
+    public function index(Request $request)
     {
-        $supports = $support->all();
+        $supports = $this->service->paginate(
+            page: $request->get('page', 1),
+            totalPerPage: $request->get('per_page', 6),
+            filter: $request->filter,
+        );
+
+        $filters = ['filter' => $request->get('filter', '')];
         
-        return view('admin.supports.index', compact('supports'));
+        return view('admin.supports.index', compact('supports', 'filters'));
     }
 
     /**
@@ -34,20 +45,19 @@ class SupportController extends Controller
      */
     public function store(Request $request, Support $support)
     {
-        $data = $request->all();
-        $data['status'] = 'a';
+        $this->service->new(
+            CreateSupportDTO::makeFromRequest($request)
+        );
 
-        $support->create($data);
-
-        return redirect()->route('supports.index');
+        return redirect()->route('supports.index')->with('message', 'Cadastrado com sucesso!');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Support $support, $id)
+    public function show(string $id)
     {
-        if(!$support = Support::find($id)) {
+        if(!$support = $this->service->findOne($id)) {
             return back();
         }
         
@@ -57,24 +67,38 @@ class SupportController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Support $support)
+    public function edit(string $id)
     {
-        //
+        if(!$support = $this->service->findOne($id)) {
+            return back();
+        }
+
+        return view('admin.supports.edit', compact('support'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Support $support)
+    public function update(StoreUpdateSupport $request, Support $support, string $id)
     {
-        //
+        $support = $this->service->update(
+            UpdateSupportDTO::makeFromRequest($request),
+        );
+
+        if(!$support) {
+            return back();
+        }
+
+        return redirect()->route('supports.index')->with('message', 'Atualizado com sucesso!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Support $support)
+    public function destroy(string $id)
     {
-        //
+        $this->service->delete($id);
+
+        return redirect()->route('supports.index')->with('message', 'Deletado com sucesso!');
     }
 }
