@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Site;
 
 use App\Models\Site;
 use Illuminate\Http\Request;
 
-class SiteController extends Controller
+class SiteController
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function contact()
     {
         return view('site.contact');
     }
